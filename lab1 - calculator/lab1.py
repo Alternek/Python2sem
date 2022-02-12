@@ -1,13 +1,12 @@
 """
 Лабораторная работа 1: Калькулятор систем счисления
-Вариант 23 (3)
+Вариант 23 (3): decimal <-> balanced ternary
 ИУ7-26Б
 Яремчук Иван
 """
-
-
+from PyQt6.QtGui import QAction, QPixmap
 from PyQt6.QtWidgets import QApplication, QLineEdit, QMainWindow, QWidget, QGridLayout, QPushButton, QVBoxLayout, \
-    QComboBox
+    QComboBox, QMessageBox
 
 
 class Calculator:
@@ -56,6 +55,7 @@ class MainUi(QMainWindow):
     """
     Main GUI
     """
+
     def __init__(self):
         """
         GUI initializer
@@ -81,7 +81,10 @@ class MainUi(QMainWindow):
         self._create_displays()
         self._create_switch()
         self._create_buttons()
+
+        # Create the menubar and the actions
         self._create_menubar()
+        self._create_actions()
 
         self._switch_active_display(0)
 
@@ -148,13 +151,53 @@ class MainUi(QMainWindow):
         # Add buttons_layout to generalLayout
         self.generalLayout.addLayout(buttons_layout)
 
-    def _create_menubar(self):
+    def _create_menubar(self) -> None:
         """
         Create menu
         """
+        # Create bones of menu
         self.menubar = self.menuBar()
+        self.fileMenu = self.menubar.addMenu('File')
         self.editMenu = self.menubar.addMenu("Edit")
         self.helpMenu = self.menubar.addMenu("Help")
+
+    def _create_actions(self) -> None:
+        """
+        Create actions for menu
+        """
+        # exit_action - exit program
+        exit_action = QAction('Exit', self)
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.triggered.connect(app.quit)
+        self.fileMenu.addAction(exit_action)
+
+        # about_action - create about_msg with info
+        about_action = QAction('About', self)
+        about_action.triggered.connect(self._about_msg())
+        self.helpMenu.addAction(about_action)
+
+        # clear_action - clear lines
+        clear_action = QAction('Clear', self)
+        clear_action.triggered.connect(self.clear_text)
+        self.editMenu.addAction(clear_action)
+
+        # number_actions - analogue buttons
+        for button_name in "01234567890+-":
+            number_action = QAction(button_name, self)
+            number_action.triggered.connect(self._generate_button(button_name))
+            self.editMenu.addAction(number_action)
+
+    @staticmethod
+    def _about_msg():
+        about_msg = QMessageBox()
+        about_msg.setIconPixmap(QPixmap("cats.png"))
+        about_msg.setWindowTitle("Информация")
+        about_msg.setText("Создатель: Яремчук Иван\nГруппа: ИУ7-26Б\nСделано с любовью")
+
+        def about_window():
+            about_msg.exec()
+
+        return about_window
 
     def _switch_active_display(self, index: int) -> None:
         if index == 0:
@@ -174,6 +217,7 @@ class MainUi(QMainWindow):
         """
         Generate function-buttons for connections
         """
+
         def button():
             if name == 'CE':
                 self.clear_text()
@@ -181,7 +225,7 @@ class MainUi(QMainWindow):
                 self.add_symbol(name)
         return button
 
-    def _change_ternary(self):
+    def _change_ternary(self) -> None:
         """
         Change ternary if decimal is modified
         """
@@ -192,7 +236,7 @@ class MainUi(QMainWindow):
             self.decDisplay.setText(Calculator.select_symbols(self.decDisplay.text(), "decimal"))
             self.terDisplay.setText(Calculator.to_ter(self.decDisplay.text()))
 
-    def _change_decimal(self):
+    def _change_decimal(self) -> None:
         """
         Change decimal if ternary is modified
         """
@@ -236,7 +280,7 @@ class MainUi(QMainWindow):
             self.set_text(self.get_text()[:-1])
             self._synchronize_display()
 
-    def clear_text(self):
+    def clear_text(self) -> None:
         """
         Clear text
         """
