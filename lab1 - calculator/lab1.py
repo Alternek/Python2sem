@@ -182,7 +182,7 @@ class MainUi(QMainWindow):
         self.editMenu.addAction(clear_action)
 
         # number_actions - analogue buttons
-        for button_name in "01234567890+-":
+        for button_name in "1234567890+-":
             number_action = QAction(button_name, self)
             number_action.triggered.connect(self._generate_button(button_name))
             self.editMenu.addAction(number_action)
