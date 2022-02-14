@@ -190,7 +190,9 @@ class MainUi(QMainWindow):
     @staticmethod
     def _about_msg():
         about_msg = QMessageBox()
-        about_msg.setIconPixmap(QPixmap("cats.png"))
+        cats_pixmap = QPixmap("cats.png")
+        cats_pixmap = cats_pixmap.scaled(300, 300)
+        about_msg.setIconPixmap(cats_pixmap)
         about_msg.setWindowTitle("Информация")
         about_msg.setText("Создатель: Яремчук Иван\nГруппа: ИУ7-26Б\nСделано с любовью")
 
@@ -233,19 +235,27 @@ class MainUi(QMainWindow):
             self.decDisplay.setText('')
             self.terDisplay.setText('')
         if self.decDisplay.isModified():
-            self.decDisplay.setText(Calculator.select_symbols(self.decDisplay.text(), "decimal"))
-            self.terDisplay.setText(Calculator.to_ter(self.decDisplay.text()))
+            if Calculator.select_symbols(self.decDisplay.text(), "decimal") == '':
+                self.decDisplay.setText('')
+                self.terDisplay.setText('')
+            else:
+                self.decDisplay.setText(Calculator.select_symbols(self.decDisplay.text(), "decimal"))
+                self.terDisplay.setText(Calculator.to_ter(self.decDisplay.text()))
 
     def _change_decimal(self) -> None:
         """
         Change decimal if ternary is modified
         """
+        if self.terDisplay.text() in ['', '0']:
+            self.decDisplay.setText('')
+            self.terDisplay.setText('')
         if self.terDisplay.isModified():
-            if self.terDisplay.text() in ['', '0']:
+            if Calculator.select_symbols(self.terDisplay.text(), "ternary") == '':
                 self.decDisplay.setText('')
                 self.terDisplay.setText('')
-            self.terDisplay.setText(Calculator.select_symbols(self.terDisplay.text(), "ternary"))
-            self.decDisplay.setText(Calculator.to_dec(self.terDisplay.text()))
+            else:
+                self.terDisplay.setText(Calculator.select_symbols(self.terDisplay.text(), "ternary"))
+                self.decDisplay.setText(Calculator.to_dec(self.terDisplay.text()))
 
     def set_text(self, text: str) -> None:
         """
